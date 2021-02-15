@@ -97,9 +97,54 @@ const ImageOfTheDay = (apod) => {
 const getImageOfTheDay = (state) => {
     let { apod } = state
 
-    fetch(`http://localhost:3000/apod`)
+    fetch(`http://localhost:3000/nasa_API`)
         .then(res => res.json())
         .then(apod => updateStore(store, { apod }))
 
     return data
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ function RoverConstructor(roverType,launchDate,landingDate,status,images) {
+        this.roverType= roverType; 
+        this.launchDate = launchDate;
+        this.landingDate = landingDate;
+        this.status = status;
+        this.images = images;
+ }
+
+
+ async function getRoverInfo(roverType) {
+
+    const res = await fetch(`http://localhost:3000/nasaAPI`, {
+        headers: {
+            'roverType': roverType,
+        }
+    });
+    let data = await res.json();
+
+    if (!data.image.hasOwnProperty("errors")) {
+        return processRoverData(data);
+    }
+
+    return data;
+}
+
+const num = 5;
+
+
