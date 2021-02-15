@@ -145,6 +145,6 @@ const getImageOfTheDay = (state) => {
     return data;
 }
 
-const num = 5;
+
 
 
