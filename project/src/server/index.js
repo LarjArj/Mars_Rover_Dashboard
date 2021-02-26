@@ -7,12 +7,15 @@ const path = require('path')
 const app = express()
 const port = 3000
 
+const Immutable = require('immutable');
+
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
 app.use('/', express.static(path.join(__dirname, '../public')))
 
 // your API calls
+const API_Key = process.env.API_KEY;
 
 // example API call
 app.get('/apod', async (req, res) => {
@@ -20,6 +23,19 @@ app.get('/apod', async (req, res) => {
         let image = await fetch(`https://api.nasa.gov/planetary/apod?api_key=${process.env.API_KEY}`)
             .then(res => res.json())
         res.send({ image })
+    } catch (err) {
+        console.log('error:', err);
+    }
+})
+
+
+app.get('/rovers/:name', async (req, res) => {
+    try {
+        const cDate = req.query.max_date
+        const url = `https://api.nasa.gov/mars-photos/api/v1/rovers/${req.params.name}/photos?earth_date=${cDate}&api_key=${process.env.API_KEY}`
+        let image = await fetch(url)
+        image = await image.json();
+        res.send(image)
     } catch (err) {
         console.log('error:', err);
     }
