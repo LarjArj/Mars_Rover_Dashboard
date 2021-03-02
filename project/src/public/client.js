@@ -1,43 +1,38 @@
-let store = {
-    user: { name: "Student" },
-    apod: '',
-    rovers: ['Curiosity', 'Opportunity', 'Spirit'],
-}
-
-// add our markup to the page
 const root = document.getElementById('root')
 
-const updateStore = (store, newState) => {
-    store = Object.assign(store, newState)
-    render(root, store)
+
+const updateStore = async (cRoot, cStore, newState = {}, callback = null) => {
+  const newStore = cStore.mergeDeep(newState)
+  await render(cRoot, newStore)
+  if (callback !== null) return callback(newStore)
 }
 
-const render = async (root, state) => {
-    root.innerHTML = App(state)
+const render = async (cRoot, state) => {
+  cRoot.innerHTML = App(cRoot, state)
 }
 
+const App = (cRoot, state) => {
+  const user = state.get('user')
+  const rovers = state.get('rovers')
+  const selectedRoverGal = state.get('selectedRoverGal')
+  const roversHtml = rovers && rovers.map((rover) => GenerateCard(state, rover)).join('')
+  const gal = selectedRoverGal && selectedRoverGal.get('photos') && selectedRoverGal.get('photos').map((photo) => PhotoModal(photo)).join('')
 
-// create content
-const App = (state) => {
-    let { rovers, apod } = state
-
-    return `
-        <header></header>
-        <main>
-            ${Greeting(store.user.name)}
-            <section>
-                <h3>Put things on the page!</h3>
-                <p>Here is an example section.</p>
-                <p>
-                    One of the most popular websites at NASA is the Astronomy Picture of the Day. In fact, this website is one of
-                    the most popular websites across all federal agencies. It has the popular appeal of a Justin Bieber video.
-                    This endpoint structures the APOD imagery and associated metadata so that it can be repurposed for other
-                    applications. In addition, if the concept_tags parameter is set to True, then keywords derived from the image
-                    explanation are returned. These keywords could be used as auto-generated hashtags for twitter or instagram feeds;
-                    but generally help with discoverability of relevant imagery.
-                </p>
-                ${ImageOfTheDay(apod)}
-            </section>
+  return `
+        <header class="container-fluid">
+            Mars Dashboard
+        </header>
+        <main class="container-fluid">
+            <div class="jumbotron">
+                ${Greeting(user.get('name'))}
+                <p class="lead">Mars rover dashboard that consumes the NASA API</p>
+            </div>
+            <div class="row">
+                ${rovers ? roversHtml : Spinner()}
+            </div>
+            <div class="row row-cols-1 row-cols-md-3">
+                ${selectedRoverGal ? gal : ''}
+            </div>
         </main>
         <footer></footer>
     `
@@ -45,106 +40,145 @@ const App = (state) => {
 
 // listening for load event because page should load before any JS is called
 window.addEventListener('load', () => {
-    render(root, store)
+  const store = Immutable.Map({
+    user: Immutable.Map({ name: 'Student' }),
+    selectedRover: false,
+    selectedRoverGal: false
+  })
+  render(root, store)
+  getListOfRovers((data) => {
+    const rovers = Immutable.Map({
+      rovers: Immutable.fromJS(data.rovers)
+    })
+    updateStore(root, store, rovers)
+  })
 })
 
-// ------------------------------------------------------  COMPONENTS
-
-// Pure function that renders conditional information -- THIS IS JUST AN EXAMPLE, you can delete it.
+/**
+ * Pure function to generate greetings HTML
+ * @returns {string} string representing greetings HTML
+ */
 const Greeting = (name) => {
-    if (name) {
-        return `
-            <h1>Welcome, ${name}!</h1>
-        `
-    }
+  if (name) {
+    return `<h1 class="display-4">Welcome, ${name}!</h1>`
+  }
+  return '<h1 class="display-4">Hello!</h1>'
+}
 
-    return `
-        <h1>Hello!</h1>
+/**
+ * Pure function to generate Spinner HTML
+ * @returns {string} string representing Spinner HTML
+ */
+const Spinner = () => {
+  return `
+        <div class="spinner-grow" style="width: 3rem; height: 3rem;" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
     `
 }
 
-// Example of a pure function that renders infomation requested from the backend
-const ImageOfTheDay = (apod) => {
+/**
+ * Pure function to generate PhotoModal HTML
+ * @returns {string} string representing PhotoModal HTML
+ */
+const PhotoModal = (photo) => {
+  const url = photo.get('img_src')
+  const alt = photo.get('camera').get('full_name')
+  const fullCamName = photo.get('camera').get('full_name')
+  const tDate = photo.get('earth_date')
+  const roverName = photo.get('rover').get('name')
+  const lDate = photo.get('rover').get('landing_date')
+  const pLDate = photo.get('rover').get('launch_date')
+  const title = `${roverName} - ${fullCamName}`
+  const status = photo.get('rover').get('status')
 
-    // If image does not already exist, or it is not from today -- request it again
-    const today = new Date()
-    const photodate = new Date(apod.date)
-    console.log(photodate.getDate(), today.getDate());
-
-    console.log(photodate.getDate() === today.getDate());
-    if (!apod || apod.date === today.getDate() ) {
-        getImageOfTheDay(store)
-    }
-
-    // check if the photo of the day is actually type video!
-    if (apod.media_type === "video") {
-        return (`
-            <p>See today's featured video <a href="${apod.url}">here</a></p>
-            <p>${apod.title}</p>
-            <p>${apod.explanation}</p>
-        `)
-    } else {
-        return (`
-            <img src="${apod.image.url}" height="350px" width="100%" />
-            <p>${apod.image.explanation}</p>
-        `)
-    }
+  const description = `This is a photo from ${fullCamName} for ${roverName}.<br /><br />
+   ${roverName} has a${status === 'active' ? 'n' : ''} ${status} status.<br /><br />
+   ${roverName} landed on Mars in ${lDate}<br /><br />
+   This project were launched in ${pLDate}<br /><br />
+   This picture were took on ${tDate}
+  `
+  return `
+    <div class="col mb-4">
+        <div class="card h-100">
+            <img src="${url}" class="card-img-top" alt="${alt}">
+            <div class="card-body">
+                <h5 class="card-title">${title}</h5>
+                <p class="card-text">${description}</p>
+            </div>
+        </div>
+    </div>
+    `
 }
 
-// ------------------------------------------------------  API CALLS
-
-// Example API call
-const getImageOfTheDay = (state) => {
-    let { apod } = state
-
-    fetch(`http://localhost:3000/nasa_API`)
-        .then(res => res.json())
-        .then(apod => updateStore(store, { apod }))
-
-    return data
+/**
+ * Pure function to generate GenerateCard HTML
+ * @returns {string} string representing GenerateCard HTML
+ */
+const GenerateCard = (store, rover) => {
+  return (`
+        <div class="col-sm-6 mb-2">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">${rover.get('name')}</h5>
+                    <p class="card-text">This rover launched in ${rover.get('launch_date')}, land in Mars in ${rover.get('landing_date')} and is now ${rover.get('status')}</p>
+                    <button  class="btn btn-primary" onclick="displayRover(${toStrArgs(store)}, ${toStrArgs(rover)})">
+                        ${
+                            store.get('selectedRover') && store.get('selectedRover').get('loading') && store.get('selectedRover').get('name') === rover.get('name')
+                            ? `<span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
+                                Loading...`
+                            : 'See Latest Image'
+                        }
+                    </button>
+                </div>
+            </div>
+        </div>
+    `)
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- function RoverConstructor(roverType,launchDate,landingDate,status,images) {
-        this.roverType= roverType; 
-        this.launchDate = launchDate;
-        this.landingDate = landingDate;
-        this.status = status;
-        this.images = images;
- }
-
-
- async function getRoverInfo(roverType) {
-
-    const res = await fetch(`http://localhost:3000/nasaAPI`, {
-        headers: {
-            'roverType': roverType,
-        }
-    });
-    let data = await res.json();
-
-    if (!data.image.hasOwnProperty("errors")) {
-        return processRoverData(data);
-    }
-
-    return data;
+/**
+ * Pure function to stringify an object
+ * @returns {string} string representing stringified object
+ */
+const toStrArgs = (args) => {
+  return JSON.stringify(args).replace(/"/g, '\'')
 }
 
+// eslint-disable-next-line no-unused-vars
+const displayRover = (store, data) => {
+  const selectedRover = Immutable.Map({
+    selectedRoverGal: false,
+    selectedRover: Immutable.fromJS({ ...data, loading: true })
+  })
 
+  updateStore(root, Immutable.fromJS(store), selectedRover, processRover)
+}
 
+const processRover = (state) => {
+  const currentRover = state.get('selectedRover')
+  getRoverData(currentRover.get('name'), currentRover.get('max_date'), (data) => {
+    const cSelectedRover = Immutable.Map({
+      selectedRoverGal: Immutable.fromJS({ ...data }),
+      selectedRover: Immutable.fromJS({ loading: false })
+    })
+    updateStore(root, state, cSelectedRover)
+  })
+}
 
+/**
+ * High order function to get list of rovers
+ */
+const getListOfRovers = (callback) => {
+  fetch('http://localhost:3000/rovers')
+    .then(res => res.json())
+    .then(json => callback(json))
+}
+
+/**
+ * High order function to get rover photos
+ */
+const getRoverData = (roverName, maxDate, callback) => {
+  fetch(`http://localhost:3000/rovers/${roverName}?max_date=${maxDate}`)
+    .then(res => res.json())
+    .then(json => callback(json))
+}
