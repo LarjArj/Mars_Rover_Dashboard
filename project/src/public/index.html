@@ -3,101 +3,22 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
     <title>Document</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css"
-    integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/immutable/3.8.2/immutable.js"></script>
-<!-- 
 </head>
-<!-- 
-<!-- 
-<body>
-    <main>
-        <div id="root">
-            <h1>Loading...</h1>
-        </div>
-    </main>
-</body> -->
+
+<body id="root"> 
+</body>
+ 
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/immutable/4.0.0-rc.12/immutable.min.js" integrity="sha512-OA48phPVdkQE2u9b6nhv71zeq9zvwc6oLq3IVWLw8WfRlcRO/+6zhUcWZxfXi75agm3bfqCxIdstBfK/g6fYvw==" crossorigin="anonymous"></script>
 <script src="/client.js"></script>
 
-
-<style>
-    a:hover {
-        background-color: slategrey;
-        color: tomato;
-    }
-
-    a:active {
-        background-color: royalblue;
-        color: peru;
-    }
-
-    .nav-tabs .nav-link {
-        border: 1px solid;
-    }
-
-    .jumbotron {
-        background: black;
-        color: white;
-        max-height: 27vh;
-    }
-</style>
-
-</head>
-
-<body>
-<div class="jumbotron">
-    <h1>NASA - MARS Rover</h1>
-    <hr>
-    <p>Please select <b> Rover Name </b> to get the latest photos and information.</p>
-</div>
-
-<div class="container">
-    <div class="row">
-        <div class="col-md-12 ">
-            <nav class="font-weight-bold">
-                <div class="nav nav-tabs nav-fill" role="tablist">
-                    <a class="nav-item nav-link " data-toggle="tab" href="#" role="tab" aria-controls="nav-home"
-                        aria-selected="true" onclick="processUI('curiosity',createDynamicUI)">Curiosity</a>
-                    <a class="nav-item nav-link" data-toggle="tab" href="#" role="tab" aria-controls="nav-profile"
-                        aria-selected="false" onclick="processUI('opportunity',createDynamicUI)">Opportunity</a>
-                    <a class="nav-item nav-link" data-toggle="tab" href="#" role="tab" aria-controls="nav-contact"
-                        aria-selected="false" onclick="processUI('spirit',createDynamicUI)">Spirit </a>
-                </div>
-            </nav>
-        </div>
-    </div>
-    <hr>
-    <div id="content">
-        <div class="card card-body text-success">
-            <div id="errorBox">
-            </div>
-            <div id="roverMetaInfo" class="row">
-                <div class="col-md-4">
-                    <b>Rover Name: </b><label id="roverName"></label>
-                </div>
-                <br>
-                <div class="col-md-4">
-                    <b>Launch Date: </b> <label id="launchDate"></label>
-                </div>
-                <br>
-                <div class="col-md-4">
-                    <b> Date: </b> <label id="landingDate"></label> <br>
-                </div>
-                <div class="col-md-4">
-                    <b>Status of the rover:</b> <label id="status"></label> <br>
-                </div>
-                <div class="col-md-4">
-                    <b>Recent date of photos: </b> <label id="recentDate"></label> <br>
-                </div>
-            </div>
-        </div>
-        <div id="roverImages" class="row">
-        </div>
-    </div>
-</body>
-
-
 </html>
+
+
